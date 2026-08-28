@@ -6,7 +6,8 @@
   "scripts": {
     "start": "ts-node src/main.ts --provider groq",
     "build": "tsc",
-    "dry": "ts-node src/main.ts --dry-run --input data/leads.csv"
+    "dry": "ts-node src/main.ts --dry-run --input data/leads.csv",
+    "test": "ts-node src/main.ts --provider groq --limit 5"
   },
   "dependencies": {
     "csv-parse": "^5.5.6",

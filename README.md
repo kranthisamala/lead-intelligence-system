@@ -16,8 +16,8 @@ npm start                     # full run on data/leads.csv
 A couple other useful commands:
 
 ```bash
-npm run dry                              # rules engine only, no LLM, no cost — instant
-npx ts-node src/main.ts --limit 5        # test the prompt on a handful of leads before the full batch
+npm run dry     # rules engine only, no LLM, no cost — instant
+npm test        # live run on just 5 leads — test the prompt before the full batch
 ```
 
 `npm start` is pinned to Groq by default; pass `--provider openai` or
