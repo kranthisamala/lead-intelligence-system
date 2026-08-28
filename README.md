@@ -16,14 +16,14 @@ npm start                     # full run on data/leads.csv
 A couple other useful commands:
 
 ```bash
-npm run dry            # rules engine only, no LLM, no cost — instant
-npm run test:prompts    # tries the prompt on 6 leads before a full batch
+npm run dry                              # rules engine only, no LLM, no cost — instant
+npx ts-node src/main.ts --limit 5        # test the prompt on a handful of leads before the full batch
 ```
 
-`npm start` and `npm run test:prompts` are pinned to Groq by default; pass
-`--provider openai` or `--provider gemini` (with the matching key in `.env`)
-to use a different one. Output lands in `output/` — `output_report.json`,
-`priority_queue.csv` (a flat list an SDR can open in Excel), and `run.log`.
+`npm start` is pinned to Groq by default; pass `--provider openai` or
+`--provider gemini` (with the matching key in `.env`) to use a different one.
+Output lands in `output/` — `output_report.json`, `priority_queue.csv` (a flat
+list an SDR can open in Excel), and `run.log`.
 
 ## The rubric
 

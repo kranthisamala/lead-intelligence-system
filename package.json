@@ -6,16 +6,8 @@
   "scripts": {
     "start": "ts-node src/main.ts --provider groq",
     "build": "tsc",
-    "dry": "ts-node src/main.ts --dry-run --input data/leads.csv",
-    "test:prompts": "ts-node test_prompts.ts --provider groq"
+    "dry": "ts-node src/main.ts --dry-run --input data/leads.csv"
   },
-  "keywords": [
-    "leads",
-    "qualification",
-    "llm",
-    "sales"
-  ],
-  "license": "MIT",
   "dependencies": {
     "csv-parse": "^5.5.6",
     "dotenv": "^16.4.5",

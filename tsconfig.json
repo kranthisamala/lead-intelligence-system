@@ -11,5 +11,5 @@
     "resolveJsonModule": true,
     "outDir": "dist"
   },
-  "include": ["src/**/*.ts", "test_prompts.ts"]
+  "include": ["src/**/*.ts"]
 }

@@ -292,13 +292,9 @@ async function main(): Promise<number> {
   }
 }
 
-// Guarded so test_prompts.ts can import parseArgs/applyProviderPreset from
-// this file without triggering a full pipeline run as a side effect.
-if (require.main === module) {
-  main()
-    .then((code) => process.exit(code))
-    .catch((err) => {
-      console.error('Unexpected fatal error:', err);
-      process.exit(1);
-    });
-}
+main()
+  .then((code) => process.exit(code))
+  .catch((err) => {
+    console.error('Unexpected fatal error:', err);
+    process.exit(1);
+  });

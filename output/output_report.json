@@ -1,6 +1,6 @@
 {
   "run_metadata": {
-    "timestamp": "2026-08-28T08:30:06.667Z",
+    "timestamp": "2026-08-28T12:46:30.527Z",
     "input_file": "leads.csv",
     "total_leads": 30,
     "reference_date": "2024-01-20",
@@ -10,7 +10,7 @@
     "batches_attempted": 0,
     "batches_failed": 0,
     "leads_with_template_fallback": 30,
-    "run_duration_ms": 19
+    "run_duration_ms": 16
   },
   "summary_stats": {
     "total_processed": 30,
