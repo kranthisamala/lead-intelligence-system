@@ -293,18 +293,16 @@ export function printSummary(report: RunReport, alerts: string[]): void {
   const m = report.run_metadata;
   const line = '─'.repeat(64);
 
-  const bar = (n: number) => '█'.repeat(Math.round((n / Math.max(s.total_processed, 1)) * 30));
-
   console.log(`\n${line}`);
   console.log(`  LEAD INTELLIGENCE REPORT — ${m.input_file}`);
   console.log(line);
   console.log(`  Processed          ${s.total_processed} leads in ${(m.run_duration_ms / 1000).toFixed(1)}s`);
   console.log(`  Reference date     ${m.reference_date}   Model: ${m.model_used}`);
   console.log(line);
-  console.log(`  Qualified          ${String(s.qualified_count).padStart(3)}  (${s.qualified_pct}%)  ${bar(s.qualified_count)}`);
-  console.log(`  Review             ${String(s.review_count).padStart(3)}  (${s.review_pct}%)  ${bar(s.review_count)}`);
-  console.log(`  Rejected           ${String(s.rejected_count).padStart(3)}  (${s.rejected_pct}%)  ${bar(s.rejected_count)}`);
-  console.log(`  Insufficient data  ${String(s.insufficient_data_count).padStart(3)}`);
+  console.log(`  Qualified          ${s.qualified_count}  (${s.qualified_pct}%)`);
+  console.log(`  Review             ${s.review_count}  (${s.review_pct}%)`);
+  console.log(`  Rejected           ${s.rejected_count}  (${s.rejected_pct}%)`);
+  console.log(`  Insufficient data  ${s.insufficient_data_count}`);
   console.log(`  Avg score          ${s.avg_score}/10  (qualified: ${s.avg_score_qualified}/10)`);
   console.log(line);
   console.log('  Top reasons leads were not pursued:');
