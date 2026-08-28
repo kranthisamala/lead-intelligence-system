@@ -1,0 +1,6 @@
+node_modules/
+dist/
+.env
+output/run.log
+# Dev-time scale testing only — the submission ships leads.csv (30 rows) alone.
+data/leads_synthetic.csv

@@ -1,0 +1,137 @@
+# ---------------------------------------------------------------------------
+# Lead Intelligence System — rubric weights + runtime settings
+#
+# Every number that reflects a business call lives here, not hardcoded in
+# rubric.ts, so it can be tuned without touching code.
+#
+# Assumed ICP: a mid-market workflow analytics platform, best fit is a
+# 50-500 employee tech-ish company that reached out to us on their own.
+# ---------------------------------------------------------------------------
+
+llm:
+  # provider: groq | openai | gemini
+  # Fallback if run with no --provider flag. `npm start` and
+  # `npm run test:prompts` each pin their own provider in package.json.
+  provider: groq
+  model: openai/gpt-oss-120b
+  fallback_model: openai/gpt-oss-20b # used automatically if the main model gets rate-limited
+  base_url: https://api.groq.com/openai/v1
+  api_key_env: GROQ_API_KEY
+  temperature: 0.5
+  max_tokens: 4096
+  # 5, not 10: Groq's free tier caps at 8000 tokens/minute, and a 10-lead
+  # batch alone requests ~6600 of that. 5 fits comfortably and completes reliably.
+  batch_size: 5
+  delay_between_batches_ms: 8000 # gives the token bucket time to refill between calls
+  max_attempts: 4 # per batch, with exponential backoff + jitter
+  timeout_ms: 60000
+
+# Reference date for the recency factor. Sample data is from Jan 2024, so
+# scoring against the real clock would mark every lead "ancient". `auto` uses
+# the newest last_interaction_date found in the input file.
+reference_date: auto
+
+# --- The five factors -------------------------------------------------------
+# Weights sum to 1.0. Company size is heaviest (strongest predictor of fit);
+# source quality next (our only proxy for intent); completeness lightest
+# (measures our data quality, not the lead's).
+weights:
+  company_size: 0.30
+  industry_fit: 0.20
+  source_quality: 0.25
+  recency: 0.15
+  data_completeness: 0.10
+
+# These bands were tuned by running the rubric over the sample leads and
+# reading the resulting distribution (see README "Tuning the rubric") — not
+# picked upfront. A 10 means genuinely textbook-ICP; an average lead lands
+# near 5, not 7.
+
+# Factor 1 — company size (employees -> 1-10). First band whose `max` the
+# value fits into wins; `max: null` is the catch-all.
+company_size_bands:
+  - { max: 9, score: 2 } # solo / micro — below our pricing floor
+  - { max: 49, score: 6 } # small; viable but rarely a mid-market deal
+  - { max: 500, score: 10 } # sweet spot — mid-market ICP
+  - { max: 2000, score: 8 } # upmarket, still good, longer sales cycle
+  - { max: 10000, score: 5 } # enterprise — different motion, needs a specialist
+  - { max: null, score: 2 } # mega-enterprise — usually the wrong segment
+company_size_missing_score: 4 # unknown size -> below neutral, plus a hard filter (below)
+
+# Factor 2 — industry fit. Unmapped industries score neutral, not punished.
+industry_tiers:
+  tier_a_score: 10
+  tier_a: [SaaS, Software, Technology, Enterprise Software, FinTech, Cybersecurity, Analytics, Data]
+  tier_b_score: 6
+  tier_b:
+    [
+      Finance,
+      Healthcare,
+      EdTech,
+      Insurance,
+      Retail,
+      Logistics,
+      Manufacturing,
+      Supply Chain,
+      Consulting,
+      Marketing,
+      Media,
+      Real Estate,
+      Travel,
+      Energy,
+      Pharmaceuticals,
+      Education,
+    ]
+  tier_c_score: 2 # known weak fit — low process complexity or no analytics budget
+  tier_c: [Agriculture, Hospitality, Events, Legal, Government, Construction, Non-profit]
+  unknown_score: 4 # unmapped or missing industry -> slightly below neutral
+
+# Factor 3 — source quality, our only proxy for buying intent. Spread is wide
+# on purpose: a demo request and a cold LinkedIn touch are opposite ends of
+# the intent scale, not two points apart.
+source_scores:
+  "Inbound demo request": 10 # they raised their hand and asked to buy
+  "Referral": 8 # warm, pre-trusted, high close rate
+  "Webinar attendee": 6 # interested in the topic, not necessarily the product
+  "Sales call": 6 # a conversation happened; intent still unproven
+  "Content download": 4 # research mode — often a student or a competitor
+  "LinkedIn outreach": 2 # we chased them; no demonstrated intent at all
+  default: 2 # unknown, blank, or unmapped source
+
+# Factor 4 — recency: days between last_interaction_date and reference_date.
+recency_bands:
+  - { max: 7, score: 10 } # still in the buying window
+  - { max: 30, score: 8 }
+  - { max: 90, score: 5 } # cooling
+  - { max: 180, score: 2 }
+  - { max: null, score: 1 } # effectively cold, needs re-nurture not a call
+recency_missing_score: 2 # no usable date -> assume cold rather than fresh
+
+# Factor 5 — data completeness: (fields present / 6) * 10 over
+# name, company, company_size, industry, source, last_interaction_date.
+
+# --- Turning a score into a decision ---------------------------------------
+# Set by running the rubric over the sample leads and reading the resulting
+# distribution: roughly a quarter qualified, a third to review, rest filtered out.
+decision_thresholds:
+  qualified_min: 8.0
+  review_min: 7.0 # [review_min, qualified_min) -> review; below -> rejected
+  insufficient_data_completeness_max: 3.4 # <= 2 of 6 fields present -> insufficient_data
+
+# Hard filters run after the composite score and can only downgrade a
+# "qualified" lead to "review" — never upgrade. They catch cases where a high
+# composite is misleading and a human should look first.
+hard_filters:
+  min_company_size_for_qualified: 10 # under 10 seats we cannot deliver value
+  max_company_size_for_qualified: 10000 # 10k+ needs enterprise sales, not this motion
+  require_known_company_size: true # never auto-qualify when the heaviest factor is unknown
+
+# Priority banding for the qualified queue, so the SDR works top-down.
+priority_tiers:
+  - { min: 9.0, tier: P1 } # call today
+  - { min: 8.0, tier: P2 } # call this week
+  - { min: 0.0, tier: P3 } # sequence / nurture
+
+output:
+  sample_message_count: 4 # how many outreach samples to surface in the report
+  write_priority_queue_csv: true # a spreadsheet the sales team can actually open

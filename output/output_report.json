@@ -1,0 +1,1444 @@
+{
+  "run_metadata": {
+    "timestamp": "2026-08-28T08:30:06.667Z",
+    "input_file": "leads.csv",
+    "total_leads": 30,
+    "reference_date": "2024-01-20",
+    "llm_enabled": false,
+    "provider": "groq",
+    "model_used": "none (rule-based + templates)",
+    "batches_attempted": 0,
+    "batches_failed": 0,
+    "leads_with_template_fallback": 30,
+    "run_duration_ms": 19
+  },
+  "summary_stats": {
+    "total_processed": 30,
+    "qualified_count": 8,
+    "qualified_pct": 26.7,
+    "review_count": 11,
+    "review_pct": 36.7,
+    "rejected_count": 11,
+    "rejected_pct": 36.7,
+    "insufficient_data_count": 0,
+    "avg_score": 7.2,
+    "avg_score_qualified": 8.9,
+    "common_rejection_reasons": [
+      {
+        "reason": "low_intent_source",
+        "count": 11
+      },
+      {
+        "reason": "poor_industry_fit",
+        "count": 5
+      },
+      {
+        "reason": "company_too_large",
+        "count": 2
+      },
+      {
+        "reason": "company_too_small",
+        "count": 2
+      },
+      {
+        "reason": "stale_engagement",
+        "count": 2
+      }
+    ],
+    "edge_cases_detected": [],
+    "estimated_analyst_hours_saved": 5
+  },
+  "priority_queue": [
+    {
+      "priority_rank": 1,
+      "priority_tier": "P1",
+      "id": "Lead_001",
+      "name": "Alice Chen",
+      "company": "CloudScale AI",
+      "composite_score": 10,
+      "headline_reason": "CloudScale AI (SaaS, 50 employees) came in via Inbound demo request, last engaged 2024-01-15. Composite fit score 10/10 against the rubric places it in \"qualified\"."
+    },
+    {
+      "priority_rank": 2,
+      "priority_tier": "P1",
+      "id": "Lead_010",
+      "name": "Jack White",
+      "company": "Digital Marketing Agency",
+      "composite_score": 9.2,
+      "headline_reason": "Digital Marketing Agency (Marketing, 120 employees) came in via Inbound demo request, last engaged 2024-01-19. Composite fit score 9.2/10 against the rubric places it in \"qualified\"."
+    },
+    {
+      "priority_rank": 3,
+      "priority_tier": "P1",
+      "id": "Lead_019",
+      "name": "Samuel Lee",
+      "company": "Cybersecurity Startup",
+      "composite_score": 9.2,
+      "headline_reason": "Cybersecurity Startup (Cybersecurity, 60 employees) came in via Referral, last engaged 2024-01-09. Composite fit score 9.2/10 against the rubric places it in \"qualified\"."
+    },
+    {
+      "priority_rank": 4,
+      "priority_tier": "P2",
+      "id": "Lead_024",
+      "name": "Xavier Lopez",
+      "company": "Data Analytics Firm",
+      "composite_score": 8.7,
+      "headline_reason": "Data Analytics Firm (Analytics, 110 employees) came in via Webinar attendee, last engaged 2023-12-22. Composite fit score 8.7/10 against the rubric places it in \"qualified\"."
+    },
+    {
+      "priority_rank": 5,
+      "priority_tier": "P2",
+      "id": "Lead_005",
+      "name": "Emma Thompson",
+      "company": "RetailWorks Solutions",
+      "composite_score": 8.5,
+      "headline_reason": "RetailWorks Solutions (Retail, 200 employees) came in via Inbound demo request, last engaged 2023-11-10. Composite fit score 8.5/10 against the rubric places it in \"qualified\"."
+    },
+    {
+      "priority_rank": 6,
+      "priority_tier": "P2",
+      "id": "Lead_014",
+      "name": "Nathan Brooks",
+      "company": "Enterprise Solutions Corp",
+      "composite_score": 8.5,
+      "headline_reason": "Enterprise Solutions Corp (Software, 3500 employees) came in via Inbound demo request, last engaged 2024-01-13. Composite fit score 8.5/10 against the rubric places it in \"qualified\"."
+    },
+    {
+      "priority_rank": 7,
+      "priority_tier": "P2",
+      "id": "Lead_025",
+      "name": "Yuki Tanaka",
+      "company": "Travel Technology",
+      "composite_score": 8.4,
+      "headline_reason": "Travel Technology (Travel, 55 employees) came in via Referral, last engaged 2024-01-04. Composite fit score 8.4/10 against the rubric places it in \"qualified\"."
+    },
+    {
+      "priority_rank": 8,
+      "priority_tier": "P2",
+      "id": "Lead_012",
+      "name": "Leon Chen",
+      "company": "FinTech Startup",
+      "composite_score": 8.3,
+      "headline_reason": "FinTech Startup (FinTech, 25 employees) came in via Referral, last engaged 2024-01-17. Composite fit score 8.3/10 against the rubric places it in \"qualified\"."
+    }
+  ],
+  "flagged_for_review": [
+    {
+      "id": "Lead_017",
+      "name": "Quinn Matthews",
+      "company": "Consulting Firm",
+      "composite_score": 7.9,
+      "why_borderline": "Scores mid-range at 7.9/10; check \"low-intent lead source\" before committing outreach time."
+    },
+    {
+      "id": "Lead_022",
+      "name": "Victor Moore",
+      "company": "Real Estate Platform",
+      "composite_score": 7.9,
+      "why_borderline": "Scores mid-range at 7.9/10; check \"low-intent lead source\" before committing outreach time."
+    },
+    {
+      "id": "Lead_026",
+      "name": "Zara Hassan",
+      "company": "Education Institution",
+      "composite_score": 7.9,
+      "why_borderline": "Scores mid-range at 7.9/10; check \"industry outside our target segments\" before committing outreach time."
+    },
+    {
+      "id": "Lead_008",
+      "name": "Henry Park",
+      "company": "EdTech Innovations",
+      "composite_score": 7.7,
+      "why_borderline": "Scores mid-range at 7.7/10; check \"low-intent lead source\" before committing outreach time."
+    },
+    {
+      "id": "Lead_030",
+      "name": "Priya Nair",
+      "company": "ClearWave Telecom",
+      "composite_score": 7.5,
+      "why_borderline": "Scores mid-range at 7.5/10; check \"industry outside our target segments\" before committing outreach time."
+    },
+    {
+      "id": "Lead_020",
+      "name": "Tina Patel",
+      "company": "Energy Solutions",
+      "composite_score": 7.4,
+      "why_borderline": "Scores mid-range at 7.4/10; check \"engagement has gone stale\" before committing outreach time."
+    },
+    {
+      "id": "Lead_023",
+      "name": "Wendy Zhang",
+      "company": "Fashion Brand",
+      "composite_score": 7.4,
+      "why_borderline": "Scores mid-range at 7.4/10; check \"low-intent lead source\" before committing outreach time."
+    },
+    {
+      "id": "Lead_029",
+      "name": "Cassandra Jones",
+      "company": "Media & Entertainment",
+      "composite_score": 7.4,
+      "why_borderline": "Scores mid-range at 7.4/10; check \"low-intent lead source\" before committing outreach time."
+    },
+    {
+      "id": "Lead_006",
+      "name": "Frank Liu",
+      "company": "Healthcare Systems Ltd",
+      "composite_score": 7.3,
+      "why_borderline": "Scores mid-range at 7.3/10; check \"low-intent lead source\" before committing outreach time."
+    },
+    {
+      "id": "Lead_004",
+      "name": "David Moore",
+      "company": "StartupXYZ",
+      "composite_score": 7.1,
+      "why_borderline": "Scores mid-range at 7.1/10; check \"company below our size floor\" before committing outreach time."
+    },
+    {
+      "id": "Lead_007",
+      "name": "Grace Lee",
+      "company": "Manufacturing Co",
+      "composite_score": 7,
+      "why_borderline": "Scores mid-range at 7/10; check \"engagement has gone stale\" before committing outreach time."
+    }
+  ],
+  "disqualified": [
+    {
+      "id": "Lead_011",
+      "name": "Karen Miller",
+      "company": "InsurancePro",
+      "composite_score": 6.9,
+      "decision": "rejected",
+      "primary_reason": "Low-intent lead source"
+    },
+    {
+      "id": "Lead_027",
+      "name": "Aaron Benj",
+      "company": "Supply Chain Co",
+      "composite_score": 6.9,
+      "decision": "rejected",
+      "primary_reason": "Low-intent lead source"
+    },
+    {
+      "id": "Lead_028",
+      "name": "Bella Cross",
+      "company": "Legal Services Firm",
+      "composite_score": 6.7,
+      "decision": "rejected",
+      "primary_reason": "Industry outside our target segments"
+    },
+    {
+      "id": "Lead_016",
+      "name": "Pamela White",
+      "company": "Pharma Research Inc",
+      "composite_score": 6,
+      "decision": "rejected",
+      "primary_reason": "Company above our mid-market ceiling"
+    },
+    {
+      "id": "Lead_013",
+      "name": "Maya Desai",
+      "company": "Agricultural Tech",
+      "composite_score": 5.7,
+      "decision": "rejected",
+      "primary_reason": "Industry outside our target segments"
+    },
+    {
+      "id": "Lead_002",
+      "name": "Bob Rodriguez",
+      "company": "TechVentures Inc",
+      "composite_score": 5.6,
+      "decision": "rejected",
+      "primary_reason": "Company below our size floor"
+    },
+    {
+      "id": "Lead_018",
+      "name": "Rachel Kim",
+      "company": "Government Agency",
+      "composite_score": 5.6,
+      "decision": "rejected",
+      "primary_reason": "Industry outside our target segments"
+    },
+    {
+      "id": "Lead_003",
+      "name": "Carol Singh",
+      "company": "National Bank Corp",
+      "composite_score": 5.5,
+      "decision": "rejected",
+      "primary_reason": "Company above our mid-market ceiling"
+    },
+    {
+      "id": "Lead_009",
+      "name": "Iris Patel",
+      "company": "Logistics Global",
+      "composite_score": 5.4,
+      "decision": "rejected",
+      "primary_reason": "Low-intent lead source"
+    },
+    {
+      "id": "Lead_021",
+      "name": "Uma Singh",
+      "company": "Event Planning Co",
+      "composite_score": 4.9,
+      "decision": "rejected",
+      "primary_reason": "Low-intent lead source"
+    },
+    {
+      "id": "Lead_015",
+      "name": "Olivia Garcia",
+      "company": "Local Restaurant Group",
+      "composite_score": 4,
+      "decision": "rejected",
+      "primary_reason": "Low-intent lead source"
+    }
+  ],
+  "sample_outreach_messages": [
+    {
+      "lead": "Alice Chen",
+      "company": "CloudScale AI",
+      "variant": "problem-led",
+      "message": "Hi Alice, at a 50-person SaaS team like CloudScale AI, work usually stalls in the hand-offs between tools rather than inside any one of them. Northbeam Analytics shows operations and revenue teams where work actually stalls, across the tools they already use. Worth 15 minutes to see whether that matches what you're seeing?"
+    },
+    {
+      "lead": "Jack White",
+      "company": "Digital Marketing Agency",
+      "variant": "peer-proof",
+      "message": "Hi Jack, we work with Marketing teams around Digital Marketing Agency's size, and teams typically cut hand-offs and manual status chasing by 20-30% in the first quarter. Given you came to us through Inbound demo request, I'd guess something specific prompted it. Open to a short call this week?"
+    },
+    {
+      "lead": "Samuel Lee",
+      "company": "Cybersecurity Startup",
+      "variant": "problem-led",
+      "message": "Hi Samuel, at a 60-person Cybersecurity team like Cybersecurity Startup, work usually stalls in the hand-offs between tools rather than inside any one of them. Northbeam Analytics shows operations and revenue teams where work actually stalls, across the tools they already use. Worth 15 minutes to see whether that matches what you're seeing?"
+    },
+    {
+      "lead": "Xavier Lopez",
+      "company": "Data Analytics Firm",
+      "variant": "peer-proof",
+      "message": "Hi Xavier, we work with Analytics teams around Data Analytics Firm's size, and teams typically cut hand-offs and manual status chasing by 20-30% in the first quarter. Given you came to us through Webinar attendee, I'd guess something specific prompted it. Open to a short call this week?"
+    }
+  ],
+  "leads": [
+    {
+      "id": "Lead_001",
+      "name": "Alice Chen",
+      "company": "CloudScale AI",
+      "company_size": 50,
+      "industry": "SaaS",
+      "source": "Inbound demo request",
+      "last_interaction_date": "2024-01-15",
+      "source_file": "leads.csv",
+      "scores": {
+        "company_size": 10,
+        "industry_fit": 10,
+        "source_quality": 10,
+        "recency": 10,
+        "data_completeness": 10
+      },
+      "weighted_contributions": {
+        "company_size": 3,
+        "industry_fit": 2,
+        "source_quality": 2.5,
+        "recency": 1.5,
+        "data_completeness": 1
+      },
+      "composite_score": 10,
+      "decision": "qualified",
+      "decision_notes": [],
+      "priority_rank": 1,
+      "priority_tier": "P1",
+      "primary_rejection_reason": null,
+      "edge_case_flags": [],
+      "reasoning": "CloudScale AI (SaaS, 50 employees) came in via Inbound demo request, last engaged 2024-01-15. Composite fit score 10/10 against the rubric places it in \"qualified\".",
+      "borderline_note": null,
+      "outreach_messages": [
+        {
+          "variant": "problem-led",
+          "text": "Hi Alice, at a 50-person SaaS team like CloudScale AI, work usually stalls in the hand-offs between tools rather than inside any one of them. Northbeam Analytics shows operations and revenue teams where work actually stalls, across the tools they already use. Worth 15 minutes to see whether that matches what you're seeing?"
+        },
+        {
+          "variant": "peer-proof",
+          "text": "Hi Alice, we work with SaaS teams around CloudScale AI's size, and teams typically cut hand-offs and manual status chasing by 20-30% in the first quarter. Given you came to us through Inbound demo request, I'd guess something specific prompted it. Open to a short call this week?"
+        }
+      ],
+      "commentary_source": "template"
+    },
+    {
+      "id": "Lead_002",
+      "name": "Bob Rodriguez",
+      "company": "TechVentures Inc",
+      "company_size": 8,
+      "industry": "SaaS",
+      "source": "LinkedIn outreach",
+      "last_interaction_date": "2024-01-20",
+      "source_file": "leads.csv",
+      "scores": {
+        "company_size": 2,
+        "industry_fit": 10,
+        "source_quality": 2,
+        "recency": 10,
+        "data_completeness": 10
+      },
+      "weighted_contributions": {
+        "company_size": 0.6,
+        "industry_fit": 2,
+        "source_quality": 0.5,
+        "recency": 1.5,
+        "data_completeness": 1
+      },
+      "composite_score": 5.6,
+      "decision": "rejected",
+      "decision_notes": [],
+      "priority_rank": null,
+      "priority_tier": null,
+      "primary_rejection_reason": "company_too_small",
+      "edge_case_flags": [],
+      "reasoning": "TechVentures Inc (SaaS, 8 employees) came in via LinkedIn outreach, last engaged 2024-01-20. Composite fit score 5.6/10 against the rubric places it in \"rejected\", with the weakest factor being: company below our size floor.",
+      "borderline_note": null,
+      "outreach_messages": [],
+      "commentary_source": "template"
+    },
+    {
+      "id": "Lead_003",
+      "name": "Carol Singh",
+      "company": "National Bank Corp",
+      "company_size": 5000,
+      "industry": "Finance",
+      "source": "Content download",
+      "last_interaction_date": "2023-12-01",
+      "source_file": "leads.csv",
+      "scores": {
+        "company_size": 5,
+        "industry_fit": 6,
+        "source_quality": 4,
+        "recency": 5,
+        "data_completeness": 10
+      },
+      "weighted_contributions": {
+        "company_size": 1.5,
+        "industry_fit": 1.2,
+        "source_quality": 1,
+        "recency": 0.8,
+        "data_completeness": 1
+      },
+      "composite_score": 5.5,
+      "decision": "rejected",
+      "decision_notes": [],
+      "priority_rank": null,
+      "priority_tier": null,
+      "primary_rejection_reason": "company_too_large",
+      "edge_case_flags": [],
+      "reasoning": "National Bank Corp (Finance, 5000 employees) came in via Content download, last engaged 2023-12-01. Composite fit score 5.5/10 against the rubric places it in \"rejected\", with the weakest factor being: company above our mid-market ceiling.",
+      "borderline_note": null,
+      "outreach_messages": [],
+      "commentary_source": "template"
+    },
+    {
+      "id": "Lead_004",
+      "name": "David Moore",
+      "company": "StartupXYZ",
+      "company_size": 3,
+      "industry": "SaaS",
+      "source": "Referral",
+      "last_interaction_date": "2024-01-18",
+      "source_file": "leads.csv",
+      "scores": {
+        "company_size": 2,
+        "industry_fit": 10,
+        "source_quality": 8,
+        "recency": 10,
+        "data_completeness": 10
+      },
+      "weighted_contributions": {
+        "company_size": 0.6,
+        "industry_fit": 2,
+        "source_quality": 2,
+        "recency": 1.5,
+        "data_completeness": 1
+      },
+      "composite_score": 7.1,
+      "decision": "review",
+      "decision_notes": [],
+      "priority_rank": 10,
+      "priority_tier": null,
+      "primary_rejection_reason": "company_too_small",
+      "edge_case_flags": [],
+      "reasoning": "StartupXYZ (SaaS, 3 employees) came in via Referral, last engaged 2024-01-18. Composite fit score 7.1/10 against the rubric places it in \"review\", with the weakest factor being: company below our size floor.",
+      "borderline_note": "Scores mid-range at 7.1/10; check \"company below our size floor\" before committing outreach time.",
+      "outreach_messages": [],
+      "commentary_source": "template"
+    },
+    {
+      "id": "Lead_005",
+      "name": "Emma Thompson",
+      "company": "RetailWorks Solutions",
+      "company_size": 200,
+      "industry": "Retail",
+      "source": "Inbound demo request",
+      "last_interaction_date": "2023-11-10",
+      "source_file": "leads.csv",
+      "scores": {
+        "company_size": 10,
+        "industry_fit": 6,
+        "source_quality": 10,
+        "recency": 5,
+        "data_completeness": 10
+      },
+      "weighted_contributions": {
+        "company_size": 3,
+        "industry_fit": 1.2,
+        "source_quality": 2.5,
+        "recency": 0.8,
+        "data_completeness": 1
+      },
+      "composite_score": 8.5,
+      "decision": "qualified",
+      "decision_notes": [],
+      "priority_rank": 5,
+      "priority_tier": "P2",
+      "primary_rejection_reason": null,
+      "edge_case_flags": [],
+      "reasoning": "RetailWorks Solutions (Retail, 200 employees) came in via Inbound demo request, last engaged 2023-11-10. Composite fit score 8.5/10 against the rubric places it in \"qualified\".",
+      "borderline_note": null,
+      "outreach_messages": [
+        {
+          "variant": "problem-led",
+          "text": "Hi Emma, at a 200-person Retail team like RetailWorks Solutions, work usually stalls in the hand-offs between tools rather than inside any one of them. Northbeam Analytics shows operations and revenue teams where work actually stalls, across the tools they already use. Worth 15 minutes to see whether that matches what you're seeing?"
+        },
+        {
+          "variant": "peer-proof",
+          "text": "Hi Emma, we work with Retail teams around RetailWorks Solutions's size, and teams typically cut hand-offs and manual status chasing by 20-30% in the first quarter. Given you came to us through Inbound demo request, I'd guess something specific prompted it. Open to a short call this week?"
+        }
+      ],
+      "commentary_source": "template"
+    },
+    {
+      "id": "Lead_006",
+      "name": "Frank Liu",
+      "company": "Healthcare Systems Ltd",
+      "company_size": 1200,
+      "industry": "Healthcare",
+      "source": "Sales call",
+      "last_interaction_date": "2024-01-12",
+      "source_file": "leads.csv",
+      "scores": {
+        "company_size": 8,
+        "industry_fit": 6,
+        "source_quality": 6,
+        "recency": 8,
+        "data_completeness": 10
+      },
+      "weighted_contributions": {
+        "company_size": 2.4,
+        "industry_fit": 1.2,
+        "source_quality": 1.5,
+        "recency": 1.2,
+        "data_completeness": 1
+      },
+      "composite_score": 7.3,
+      "decision": "review",
+      "decision_notes": [],
+      "priority_rank": 9,
+      "priority_tier": null,
+      "primary_rejection_reason": "low_intent_source",
+      "edge_case_flags": [],
+      "reasoning": "Healthcare Systems Ltd (Healthcare, 1200 employees) came in via Sales call, last engaged 2024-01-12. Composite fit score 7.3/10 against the rubric places it in \"review\", with the weakest factor being: low-intent lead source.",
+      "borderline_note": "Scores mid-range at 7.3/10; check \"low-intent lead source\" before committing outreach time.",
+      "outreach_messages": [],
+      "commentary_source": "template"
+    },
+    {
+      "id": "Lead_007",
+      "name": "Grace Lee",
+      "company": "Manufacturing Co",
+      "company_size": 450,
+      "industry": "Manufacturing",
+      "source": "Webinar attendee",
+      "last_interaction_date": "2023-10-05",
+      "source_file": "leads.csv",
+      "scores": {
+        "company_size": 10,
+        "industry_fit": 6,
+        "source_quality": 6,
+        "recency": 2,
+        "data_completeness": 10
+      },
+      "weighted_contributions": {
+        "company_size": 3,
+        "industry_fit": 1.2,
+        "source_quality": 1.5,
+        "recency": 0.3,
+        "data_completeness": 1
+      },
+      "composite_score": 7,
+      "decision": "review",
+      "decision_notes": [],
+      "priority_rank": 11,
+      "priority_tier": null,
+      "primary_rejection_reason": "stale_engagement",
+      "edge_case_flags": [],
+      "reasoning": "Manufacturing Co (Manufacturing, 450 employees) came in via Webinar attendee, last engaged 2023-10-05. Composite fit score 7/10 against the rubric places it in \"review\", with the weakest factor being: engagement has gone stale.",
+      "borderline_note": "Scores mid-range at 7/10; check \"engagement has gone stale\" before committing outreach time.",
+      "outreach_messages": [],
+      "commentary_source": "template"
+    },
+    {
+      "id": "Lead_008",
+      "name": "Henry Park",
+      "company": "EdTech Innovations",
+      "company_size": 75,
+      "industry": "EdTech",
+      "source": "Content download",
+      "last_interaction_date": "2024-01-14",
+      "source_file": "leads.csv",
+      "scores": {
+        "company_size": 10,
+        "industry_fit": 6,
+        "source_quality": 4,
+        "recency": 10,
+        "data_completeness": 10
+      },
+      "weighted_contributions": {
+        "company_size": 3,
+        "industry_fit": 1.2,
+        "source_quality": 1,
+        "recency": 1.5,
+        "data_completeness": 1
+      },
+      "composite_score": 7.7,
+      "decision": "review",
+      "decision_notes": [],
+      "priority_rank": 4,
+      "priority_tier": null,
+      "primary_rejection_reason": "low_intent_source",
+      "edge_case_flags": [],
+      "reasoning": "EdTech Innovations (EdTech, 75 employees) came in via Content download, last engaged 2024-01-14. Composite fit score 7.7/10 against the rubric places it in \"review\", with the weakest factor being: low-intent lead source.",
+      "borderline_note": "Scores mid-range at 7.7/10; check \"low-intent lead source\" before committing outreach time.",
+      "outreach_messages": [],
+      "commentary_source": "template"
+    },
+    {
+      "id": "Lead_009",
+      "name": "Iris Patel",
+      "company": "Logistics Global",
+      "company_size": 800,
+      "industry": "Logistics",
+      "source": "LinkedIn outreach",
+      "last_interaction_date": "2023-09-20",
+      "source_file": "leads.csv",
+      "scores": {
+        "company_size": 8,
+        "industry_fit": 6,
+        "source_quality": 2,
+        "recency": 2,
+        "data_completeness": 10
+      },
+      "weighted_contributions": {
+        "company_size": 2.4,
+        "industry_fit": 1.2,
+        "source_quality": 0.5,
+        "recency": 0.3,
+        "data_completeness": 1
+      },
+      "composite_score": 5.4,
+      "decision": "rejected",
+      "decision_notes": [],
+      "priority_rank": null,
+      "priority_tier": null,
+      "primary_rejection_reason": "low_intent_source",
+      "edge_case_flags": [],
+      "reasoning": "Logistics Global (Logistics, 800 employees) came in via LinkedIn outreach, last engaged 2023-09-20. Composite fit score 5.4/10 against the rubric places it in \"rejected\", with the weakest factor being: low-intent lead source.",
+      "borderline_note": null,
+      "outreach_messages": [],
+      "commentary_source": "template"
+    },
+    {
+      "id": "Lead_010",
+      "name": "Jack White",
+      "company": "Digital Marketing Agency",
+      "company_size": 120,
+      "industry": "Marketing",
+      "source": "Inbound demo request",
+      "last_interaction_date": "2024-01-19",
+      "source_file": "leads.csv",
+      "scores": {
+        "company_size": 10,
+        "industry_fit": 6,
+        "source_quality": 10,
+        "recency": 10,
+        "data_completeness": 10
+      },
+      "weighted_contributions": {
+        "company_size": 3,
+        "industry_fit": 1.2,
+        "source_quality": 2.5,
+        "recency": 1.5,
+        "data_completeness": 1
+      },
+      "composite_score": 9.2,
+      "decision": "qualified",
+      "decision_notes": [],
+      "priority_rank": 2,
+      "priority_tier": "P1",
+      "primary_rejection_reason": null,
+      "edge_case_flags": [],
+      "reasoning": "Digital Marketing Agency (Marketing, 120 employees) came in via Inbound demo request, last engaged 2024-01-19. Composite fit score 9.2/10 against the rubric places it in \"qualified\".",
+      "borderline_note": null,
+      "outreach_messages": [
+        {
+          "variant": "problem-led",
+          "text": "Hi Jack, at a 120-person Marketing team like Digital Marketing Agency, work usually stalls in the hand-offs between tools rather than inside any one of them. Northbeam Analytics shows operations and revenue teams where work actually stalls, across the tools they already use. Worth 15 minutes to see whether that matches what you're seeing?"
+        },
+        {
+          "variant": "peer-proof",
+          "text": "Hi Jack, we work with Marketing teams around Digital Marketing Agency's size, and teams typically cut hand-offs and manual status chasing by 20-30% in the first quarter. Given you came to us through Inbound demo request, I'd guess something specific prompted it. Open to a short call this week?"
+        }
+      ],
+      "commentary_source": "template"
+    },
+    {
+      "id": "Lead_011",
+      "name": "Karen Miller",
+      "company": "InsurancePro",
+      "company_size": 600,
+      "industry": "Insurance",
+      "source": "Sales call",
+      "last_interaction_date": "2023-12-15",
+      "source_file": "leads.csv",
+      "scores": {
+        "company_size": 8,
+        "industry_fit": 6,
+        "source_quality": 6,
+        "recency": 5,
+        "data_completeness": 10
+      },
+      "weighted_contributions": {
+        "company_size": 2.4,
+        "industry_fit": 1.2,
+        "source_quality": 1.5,
+        "recency": 0.8,
+        "data_completeness": 1
+      },
+      "composite_score": 6.9,
+      "decision": "rejected",
+      "decision_notes": [],
+      "priority_rank": null,
+      "priority_tier": null,
+      "primary_rejection_reason": "low_intent_source",
+      "edge_case_flags": [],
+      "reasoning": "InsurancePro (Insurance, 600 employees) came in via Sales call, last engaged 2023-12-15. Composite fit score 6.9/10 against the rubric places it in \"rejected\", with the weakest factor being: low-intent lead source.",
+      "borderline_note": null,
+      "outreach_messages": [],
+      "commentary_source": "template"
+    },
+    {
+      "id": "Lead_012",
+      "name": "Leon Chen",
+      "company": "FinTech Startup",
+      "company_size": 25,
+      "industry": "FinTech",
+      "source": "Referral",
+      "last_interaction_date": "2024-01-17",
+      "source_file": "leads.csv",
+      "scores": {
+        "company_size": 6,
+        "industry_fit": 10,
+        "source_quality": 8,
+        "recency": 10,
+        "data_completeness": 10
+      },
+      "weighted_contributions": {
+        "company_size": 1.8,
+        "industry_fit": 2,
+        "source_quality": 2,
+        "recency": 1.5,
+        "data_completeness": 1
+      },
+      "composite_score": 8.3,
+      "decision": "qualified",
+      "decision_notes": [],
+      "priority_rank": 8,
+      "priority_tier": "P2",
+      "primary_rejection_reason": null,
+      "edge_case_flags": [],
+      "reasoning": "FinTech Startup (FinTech, 25 employees) came in via Referral, last engaged 2024-01-17. Composite fit score 8.3/10 against the rubric places it in \"qualified\".",
+      "borderline_note": null,
+      "outreach_messages": [
+        {
+          "variant": "problem-led",
+          "text": "Hi Leon, at a 25-person FinTech team like FinTech Startup, work usually stalls in the hand-offs between tools rather than inside any one of them. Northbeam Analytics shows operations and revenue teams where work actually stalls, across the tools they already use. Worth 15 minutes to see whether that matches what you're seeing?"
+        },
+        {
+          "variant": "peer-proof",
+          "text": "Hi Leon, we work with FinTech teams around FinTech Startup's size, and teams typically cut hand-offs and manual status chasing by 20-30% in the first quarter. Given you came to us through Referral, I'd guess something specific prompted it. Open to a short call this week?"
+        }
+      ],
+      "commentary_source": "template"
+    },
+    {
+      "id": "Lead_013",
+      "name": "Maya Desai",
+      "company": "Agricultural Tech",
+      "company_size": 45,
+      "industry": "Agriculture",
+      "source": "Content download",
+      "last_interaction_date": "2024-01-16",
+      "source_file": "leads.csv",
+      "scores": {
+        "company_size": 6,
+        "industry_fit": 2,
+        "source_quality": 4,
+        "recency": 10,
+        "data_completeness": 10
+      },
+      "weighted_contributions": {
+        "company_size": 1.8,
+        "industry_fit": 0.4,
+        "source_quality": 1,
+        "recency": 1.5,
+        "data_completeness": 1
+      },
+      "composite_score": 5.7,
+      "decision": "rejected",
+      "decision_notes": [],
+      "priority_rank": null,
+      "priority_tier": null,
+      "primary_rejection_reason": "poor_industry_fit",
+      "edge_case_flags": [],
+      "reasoning": "Agricultural Tech (Agriculture, 45 employees) came in via Content download, last engaged 2024-01-16. Composite fit score 5.7/10 against the rubric places it in \"rejected\", with the weakest factor being: industry outside our target segments.",
+      "borderline_note": null,
+      "outreach_messages": [],
+      "commentary_source": "template"
+    },
+    {
+      "id": "Lead_014",
+      "name": "Nathan Brooks",
+      "company": "Enterprise Solutions Corp",
+      "company_size": 3500,
+      "industry": "Software",
+      "source": "Inbound demo request",
+      "last_interaction_date": "2024-01-13",
+      "source_file": "leads.csv",
+      "scores": {
+        "company_size": 5,
+        "industry_fit": 10,
+        "source_quality": 10,
+        "recency": 10,
+        "data_completeness": 10
+      },
+      "weighted_contributions": {
+        "company_size": 1.5,
+        "industry_fit": 2,
+        "source_quality": 2.5,
+        "recency": 1.5,
+        "data_completeness": 1
+      },
+      "composite_score": 8.5,
+      "decision": "qualified",
+      "decision_notes": [],
+      "priority_rank": 6,
+      "priority_tier": "P2",
+      "primary_rejection_reason": null,
+      "edge_case_flags": [],
+      "reasoning": "Enterprise Solutions Corp (Software, 3500 employees) came in via Inbound demo request, last engaged 2024-01-13. Composite fit score 8.5/10 against the rubric places it in \"qualified\".",
+      "borderline_note": null,
+      "outreach_messages": [
+        {
+          "variant": "problem-led",
+          "text": "Hi Nathan, at a 3500-person Software team like Enterprise Solutions Corp, work usually stalls in the hand-offs between tools rather than inside any one of them. Northbeam Analytics shows operations and revenue teams where work actually stalls, across the tools they already use. Worth 15 minutes to see whether that matches what you're seeing?"
+        },
+        {
+          "variant": "peer-proof",
+          "text": "Hi Nathan, we work with Software teams around Enterprise Solutions Corp's size, and teams typically cut hand-offs and manual status chasing by 20-30% in the first quarter. Given you came to us through Inbound demo request, I'd guess something specific prompted it. Open to a short call this week?"
+        }
+      ],
+      "commentary_source": "template"
+    },
+    {
+      "id": "Lead_015",
+      "name": "Olivia Garcia",
+      "company": "Local Restaurant Group",
+      "company_size": 12,
+      "industry": "Hospitality",
+      "source": "LinkedIn outreach",
+      "last_interaction_date": "2023-08-30",
+      "source_file": "leads.csv",
+      "scores": {
+        "company_size": 6,
+        "industry_fit": 2,
+        "source_quality": 2,
+        "recency": 2,
+        "data_completeness": 10
+      },
+      "weighted_contributions": {
+        "company_size": 1.8,
+        "industry_fit": 0.4,
+        "source_quality": 0.5,
+        "recency": 0.3,
+        "data_completeness": 1
+      },
+      "composite_score": 4,
+      "decision": "rejected",
+      "decision_notes": [],
+      "priority_rank": null,
+      "priority_tier": null,
+      "primary_rejection_reason": "low_intent_source",
+      "edge_case_flags": [],
+      "reasoning": "Local Restaurant Group (Hospitality, 12 employees) came in via LinkedIn outreach, last engaged 2023-08-30. Composite fit score 4/10 against the rubric places it in \"rejected\", with the weakest factor being: low-intent lead source.",
+      "borderline_note": null,
+      "outreach_messages": [],
+      "commentary_source": "template"
+    },
+    {
+      "id": "Lead_016",
+      "name": "Pamela White",
+      "company": "Pharma Research Inc",
+      "company_size": 2200,
+      "industry": "Pharmaceuticals",
+      "source": "Sales call",
+      "last_interaction_date": "2023-11-25",
+      "source_file": "leads.csv",
+      "scores": {
+        "company_size": 5,
+        "industry_fit": 6,
+        "source_quality": 6,
+        "recency": 5,
+        "data_completeness": 10
+      },
+      "weighted_contributions": {
+        "company_size": 1.5,
+        "industry_fit": 1.2,
+        "source_quality": 1.5,
+        "recency": 0.8,
+        "data_completeness": 1
+      },
+      "composite_score": 6,
+      "decision": "rejected",
+      "decision_notes": [],
+      "priority_rank": null,
+      "priority_tier": null,
+      "primary_rejection_reason": "company_too_large",
+      "edge_case_flags": [],
+      "reasoning": "Pharma Research Inc (Pharmaceuticals, 2200 employees) came in via Sales call, last engaged 2023-11-25. Composite fit score 6/10 against the rubric places it in \"rejected\", with the weakest factor being: company above our mid-market ceiling.",
+      "borderline_note": null,
+      "outreach_messages": [],
+      "commentary_source": "template"
+    },
+    {
+      "id": "Lead_017",
+      "name": "Quinn Matthews",
+      "company": "Consulting Firm",
+      "company_size": 180,
+      "industry": "Consulting",
+      "source": "Webinar attendee",
+      "last_interaction_date": "2024-01-11",
+      "source_file": "leads.csv",
+      "scores": {
+        "company_size": 10,
+        "industry_fit": 6,
+        "source_quality": 6,
+        "recency": 8,
+        "data_completeness": 10
+      },
+      "weighted_contributions": {
+        "company_size": 3,
+        "industry_fit": 1.2,
+        "source_quality": 1.5,
+        "recency": 1.2,
+        "data_completeness": 1
+      },
+      "composite_score": 7.9,
+      "decision": "review",
+      "decision_notes": [],
+      "priority_rank": 1,
+      "priority_tier": null,
+      "primary_rejection_reason": "low_intent_source",
+      "edge_case_flags": [],
+      "reasoning": "Consulting Firm (Consulting, 180 employees) came in via Webinar attendee, last engaged 2024-01-11. Composite fit score 7.9/10 against the rubric places it in \"review\", with the weakest factor being: low-intent lead source.",
+      "borderline_note": "Scores mid-range at 7.9/10; check \"low-intent lead source\" before committing outreach time.",
+      "outreach_messages": [],
+      "commentary_source": "template"
+    },
+    {
+      "id": "Lead_018",
+      "name": "Rachel Kim",
+      "company": "Government Agency",
+      "company_size": 800,
+      "industry": "Government",
+      "source": "Content download",
+      "last_interaction_date": "2023-12-10",
+      "source_file": "leads.csv",
+      "scores": {
+        "company_size": 8,
+        "industry_fit": 2,
+        "source_quality": 4,
+        "recency": 5,
+        "data_completeness": 10
+      },
+      "weighted_contributions": {
+        "company_size": 2.4,
+        "industry_fit": 0.4,
+        "source_quality": 1,
+        "recency": 0.8,
+        "data_completeness": 1
+      },
+      "composite_score": 5.6,
+      "decision": "rejected",
+      "decision_notes": [],
+      "priority_rank": null,
+      "priority_tier": null,
+      "primary_rejection_reason": "poor_industry_fit",
+      "edge_case_flags": [],
+      "reasoning": "Government Agency (Government, 800 employees) came in via Content download, last engaged 2023-12-10. Composite fit score 5.6/10 against the rubric places it in \"rejected\", with the weakest factor being: industry outside our target segments.",
+      "borderline_note": null,
+      "outreach_messages": [],
+      "commentary_source": "template"
+    },
+    {
+      "id": "Lead_019",
+      "name": "Samuel Lee",
+      "company": "Cybersecurity Startup",
+      "company_size": 60,
+      "industry": "Cybersecurity",
+      "source": "Referral",
+      "last_interaction_date": "2024-01-09",
+      "source_file": "leads.csv",
+      "scores": {
+        "company_size": 10,
+        "industry_fit": 10,
+        "source_quality": 8,
+        "recency": 8,
+        "data_completeness": 10
+      },
+      "weighted_contributions": {
+        "company_size": 3,
+        "industry_fit": 2,
+        "source_quality": 2,
+        "recency": 1.2,
+        "data_completeness": 1
+      },
+      "composite_score": 9.2,
+      "decision": "qualified",
+      "decision_notes": [],
+      "priority_rank": 3,
+      "priority_tier": "P1",
+      "primary_rejection_reason": null,
+      "edge_case_flags": [],
+      "reasoning": "Cybersecurity Startup (Cybersecurity, 60 employees) came in via Referral, last engaged 2024-01-09. Composite fit score 9.2/10 against the rubric places it in \"qualified\".",
+      "borderline_note": null,
+      "outreach_messages": [
+        {
+          "variant": "problem-led",
+          "text": "Hi Samuel, at a 60-person Cybersecurity team like Cybersecurity Startup, work usually stalls in the hand-offs between tools rather than inside any one of them. Northbeam Analytics shows operations and revenue teams where work actually stalls, across the tools they already use. Worth 15 minutes to see whether that matches what you're seeing?"
+        },
+        {
+          "variant": "peer-proof",
+          "text": "Hi Samuel, we work with Cybersecurity teams around Cybersecurity Startup's size, and teams typically cut hand-offs and manual status chasing by 20-30% in the first quarter. Given you came to us through Referral, I'd guess something specific prompted it. Open to a short call this week?"
+        }
+      ],
+      "commentary_source": "template"
+    },
+    {
+      "id": "Lead_020",
+      "name": "Tina Patel",
+      "company": "Energy Solutions",
+      "company_size": 900,
+      "industry": "Energy",
+      "source": "Inbound demo request",
+      "last_interaction_date": "2023-10-18",
+      "source_file": "leads.csv",
+      "scores": {
+        "company_size": 8,
+        "industry_fit": 6,
+        "source_quality": 10,
+        "recency": 2,
+        "data_completeness": 10
+      },
+      "weighted_contributions": {
+        "company_size": 2.4,
+        "industry_fit": 1.2,
+        "source_quality": 2.5,
+        "recency": 0.3,
+        "data_completeness": 1
+      },
+      "composite_score": 7.4,
+      "decision": "review",
+      "decision_notes": [],
+      "priority_rank": 6,
+      "priority_tier": null,
+      "primary_rejection_reason": "stale_engagement",
+      "edge_case_flags": [],
+      "reasoning": "Energy Solutions (Energy, 900 employees) came in via Inbound demo request, last engaged 2023-10-18. Composite fit score 7.4/10 against the rubric places it in \"review\", with the weakest factor being: engagement has gone stale.",
+      "borderline_note": "Scores mid-range at 7.4/10; check \"engagement has gone stale\" before committing outreach time.",
+      "outreach_messages": [],
+      "commentary_source": "template"
+    },
+    {
+      "id": "Lead_021",
+      "name": "Uma Singh",
+      "company": "Event Planning Co",
+      "company_size": 35,
+      "industry": "Events",
+      "source": "LinkedIn outreach",
+      "last_interaction_date": "2024-01-08",
+      "source_file": "leads.csv",
+      "scores": {
+        "company_size": 6,
+        "industry_fit": 2,
+        "source_quality": 2,
+        "recency": 8,
+        "data_completeness": 10
+      },
+      "weighted_contributions": {
+        "company_size": 1.8,
+        "industry_fit": 0.4,
+        "source_quality": 0.5,
+        "recency": 1.2,
+        "data_completeness": 1
+      },
+      "composite_score": 4.9,
+      "decision": "rejected",
+      "decision_notes": [],
+      "priority_rank": null,
+      "priority_tier": null,
+      "primary_rejection_reason": "low_intent_source",
+      "edge_case_flags": [],
+      "reasoning": "Event Planning Co (Events, 35 employees) came in via LinkedIn outreach, last engaged 2024-01-08. Composite fit score 4.9/10 against the rubric places it in \"rejected\", with the weakest factor being: low-intent lead source.",
+      "borderline_note": null,
+      "outreach_messages": [],
+      "commentary_source": "template"
+    },
+    {
+      "id": "Lead_022",
+      "name": "Victor Moore",
+      "company": "Real Estate Platform",
+      "company_size": 250,
+      "industry": "Real Estate",
+      "source": "Sales call",
+      "last_interaction_date": "2024-01-06",
+      "source_file": "leads.csv",
+      "scores": {
+        "company_size": 10,
+        "industry_fit": 6,
+        "source_quality": 6,
+        "recency": 8,
+        "data_completeness": 10
+      },
+      "weighted_contributions": {
+        "company_size": 3,
+        "industry_fit": 1.2,
+        "source_quality": 1.5,
+        "recency": 1.2,
+        "data_completeness": 1
+      },
+      "composite_score": 7.9,
+      "decision": "review",
+      "decision_notes": [],
+      "priority_rank": 2,
+      "priority_tier": null,
+      "primary_rejection_reason": "low_intent_source",
+      "edge_case_flags": [],
+      "reasoning": "Real Estate Platform (Real Estate, 250 employees) came in via Sales call, last engaged 2024-01-06. Composite fit score 7.9/10 against the rubric places it in \"review\", with the weakest factor being: low-intent lead source.",
+      "borderline_note": "Scores mid-range at 7.9/10; check \"low-intent lead source\" before committing outreach time.",
+      "outreach_messages": [],
+      "commentary_source": "template"
+    },
+    {
+      "id": "Lead_023",
+      "name": "Wendy Zhang",
+      "company": "Fashion Brand",
+      "company_size": 400,
+      "industry": "Retail",
+      "source": "Content download",
+      "last_interaction_date": "2024-01-05",
+      "source_file": "leads.csv",
+      "scores": {
+        "company_size": 10,
+        "industry_fit": 6,
+        "source_quality": 4,
+        "recency": 8,
+        "data_completeness": 10
+      },
+      "weighted_contributions": {
+        "company_size": 3,
+        "industry_fit": 1.2,
+        "source_quality": 1,
+        "recency": 1.2,
+        "data_completeness": 1
+      },
+      "composite_score": 7.4,
+      "decision": "review",
+      "decision_notes": [],
+      "priority_rank": 7,
+      "priority_tier": null,
+      "primary_rejection_reason": "low_intent_source",
+      "edge_case_flags": [],
+      "reasoning": "Fashion Brand (Retail, 400 employees) came in via Content download, last engaged 2024-01-05. Composite fit score 7.4/10 against the rubric places it in \"review\", with the weakest factor being: low-intent lead source.",
+      "borderline_note": "Scores mid-range at 7.4/10; check \"low-intent lead source\" before committing outreach time.",
+      "outreach_messages": [],
+      "commentary_source": "template"
+    },
+    {
+      "id": "Lead_024",
+      "name": "Xavier Lopez",
+      "company": "Data Analytics Firm",
+      "company_size": 110,
+      "industry": "Analytics",
+      "source": "Webinar attendee",
+      "last_interaction_date": "2023-12-22",
+      "source_file": "leads.csv",
+      "scores": {
+        "company_size": 10,
+        "industry_fit": 10,
+        "source_quality": 6,
+        "recency": 8,
+        "data_completeness": 10
+      },
+      "weighted_contributions": {
+        "company_size": 3,
+        "industry_fit": 2,
+        "source_quality": 1.5,
+        "recency": 1.2,
+        "data_completeness": 1
+      },
+      "composite_score": 8.7,
+      "decision": "qualified",
+      "decision_notes": [],
+      "priority_rank": 4,
+      "priority_tier": "P2",
+      "primary_rejection_reason": null,
+      "edge_case_flags": [],
+      "reasoning": "Data Analytics Firm (Analytics, 110 employees) came in via Webinar attendee, last engaged 2023-12-22. Composite fit score 8.7/10 against the rubric places it in \"qualified\".",
+      "borderline_note": null,
+      "outreach_messages": [
+        {
+          "variant": "problem-led",
+          "text": "Hi Xavier, at a 110-person Analytics team like Data Analytics Firm, work usually stalls in the hand-offs between tools rather than inside any one of them. Northbeam Analytics shows operations and revenue teams where work actually stalls, across the tools they already use. Worth 15 minutes to see whether that matches what you're seeing?"
+        },
+        {
+          "variant": "peer-proof",
+          "text": "Hi Xavier, we work with Analytics teams around Data Analytics Firm's size, and teams typically cut hand-offs and manual status chasing by 20-30% in the first quarter. Given you came to us through Webinar attendee, I'd guess something specific prompted it. Open to a short call this week?"
+        }
+      ],
+      "commentary_source": "template"
+    },
+    {
+      "id": "Lead_025",
+      "name": "Yuki Tanaka",
+      "company": "Travel Technology",
+      "company_size": 55,
+      "industry": "Travel",
+      "source": "Referral",
+      "last_interaction_date": "2024-01-04",
+      "source_file": "leads.csv",
+      "scores": {
+        "company_size": 10,
+        "industry_fit": 6,
+        "source_quality": 8,
+        "recency": 8,
+        "data_completeness": 10
+      },
+      "weighted_contributions": {
+        "company_size": 3,
+        "industry_fit": 1.2,
+        "source_quality": 2,
+        "recency": 1.2,
+        "data_completeness": 1
+      },
+      "composite_score": 8.4,
+      "decision": "qualified",
+      "decision_notes": [],
+      "priority_rank": 7,
+      "priority_tier": "P2",
+      "primary_rejection_reason": null,
+      "edge_case_flags": [],
+      "reasoning": "Travel Technology (Travel, 55 employees) came in via Referral, last engaged 2024-01-04. Composite fit score 8.4/10 against the rubric places it in \"qualified\".",
+      "borderline_note": null,
+      "outreach_messages": [
+        {
+          "variant": "problem-led",
+          "text": "Hi Yuki, at a 55-person Travel team like Travel Technology, work usually stalls in the hand-offs between tools rather than inside any one of them. Northbeam Analytics shows operations and revenue teams where work actually stalls, across the tools they already use. Worth 15 minutes to see whether that matches what you're seeing?"
+        },
+        {
+          "variant": "peer-proof",
+          "text": "Hi Yuki, we work with Travel teams around Travel Technology's size, and teams typically cut hand-offs and manual status chasing by 20-30% in the first quarter. Given you came to us through Referral, I'd guess something specific prompted it. Open to a short call this week?"
+        }
+      ],
+      "commentary_source": "template"
+    },
+    {
+      "id": "Lead_026",
+      "name": "Zara Hassan",
+      "company": "Education Institution",
+      "company_size": 600,
+      "industry": "Education",
+      "source": "Inbound demo request",
+      "last_interaction_date": "2023-12-05",
+      "source_file": "leads.csv",
+      "scores": {
+        "company_size": 8,
+        "industry_fit": 6,
+        "source_quality": 10,
+        "recency": 5,
+        "data_completeness": 10
+      },
+      "weighted_contributions": {
+        "company_size": 2.4,
+        "industry_fit": 1.2,
+        "source_quality": 2.5,
+        "recency": 0.8,
+        "data_completeness": 1
+      },
+      "composite_score": 7.9,
+      "decision": "review",
+      "decision_notes": [],
+      "priority_rank": 3,
+      "priority_tier": null,
+      "primary_rejection_reason": "poor_industry_fit",
+      "edge_case_flags": [],
+      "reasoning": "Education Institution (Education, 600 employees) came in via Inbound demo request, last engaged 2023-12-05. Composite fit score 7.9/10 against the rubric places it in \"review\", with the weakest factor being: industry outside our target segments.",
+      "borderline_note": "Scores mid-range at 7.9/10; check \"industry outside our target segments\" before committing outreach time.",
+      "outreach_messages": [],
+      "commentary_source": "template"
+    },
+    {
+      "id": "Lead_027",
+      "name": "Aaron Benj",
+      "company": "Supply Chain Co",
+      "company_size": 320,
+      "industry": "Supply Chain",
+      "source": "LinkedIn outreach",
+      "last_interaction_date": "2024-01-02",
+      "source_file": "leads.csv",
+      "scores": {
+        "company_size": 10,
+        "industry_fit": 6,
+        "source_quality": 2,
+        "recency": 8,
+        "data_completeness": 10
+      },
+      "weighted_contributions": {
+        "company_size": 3,
+        "industry_fit": 1.2,
+        "source_quality": 0.5,
+        "recency": 1.2,
+        "data_completeness": 1
+      },
+      "composite_score": 6.9,
+      "decision": "rejected",
+      "decision_notes": [],
+      "priority_rank": null,
+      "priority_tier": null,
+      "primary_rejection_reason": "low_intent_source",
+      "edge_case_flags": [],
+      "reasoning": "Supply Chain Co (Supply Chain, 320 employees) came in via LinkedIn outreach, last engaged 2024-01-02. Composite fit score 6.9/10 against the rubric places it in \"rejected\", with the weakest factor being: low-intent lead source.",
+      "borderline_note": null,
+      "outreach_messages": [],
+      "commentary_source": "template"
+    },
+    {
+      "id": "Lead_028",
+      "name": "Bella Cross",
+      "company": "Legal Services Firm",
+      "company_size": 90,
+      "industry": "Legal",
+      "source": "Sales call",
+      "last_interaction_date": "2023-11-30",
+      "source_file": "leads.csv",
+      "scores": {
+        "company_size": 10,
+        "industry_fit": 2,
+        "source_quality": 6,
+        "recency": 5,
+        "data_completeness": 10
+      },
+      "weighted_contributions": {
+        "company_size": 3,
+        "industry_fit": 0.4,
+        "source_quality": 1.5,
+        "recency": 0.8,
+        "data_completeness": 1
+      },
+      "composite_score": 6.7,
+      "decision": "rejected",
+      "decision_notes": [],
+      "priority_rank": null,
+      "priority_tier": null,
+      "primary_rejection_reason": "poor_industry_fit",
+      "edge_case_flags": [],
+      "reasoning": "Legal Services Firm (Legal, 90 employees) came in via Sales call, last engaged 2023-11-30. Composite fit score 6.7/10 against the rubric places it in \"rejected\", with the weakest factor being: industry outside our target segments.",
+      "borderline_note": null,
+      "outreach_messages": [],
+      "commentary_source": "template"
+    },
+    {
+      "id": "Lead_029",
+      "name": "Cassandra Jones",
+      "company": "Media & Entertainment",
+      "company_size": 150,
+      "industry": "Media",
+      "source": "Content download",
+      "last_interaction_date": "2024-01-01",
+      "source_file": "leads.csv",
+      "scores": {
+        "company_size": 10,
+        "industry_fit": 6,
+        "source_quality": 4,
+        "recency": 8,
+        "data_completeness": 10
+      },
+      "weighted_contributions": {
+        "company_size": 3,
+        "industry_fit": 1.2,
+        "source_quality": 1,
+        "recency": 1.2,
+        "data_completeness": 1
+      },
+      "composite_score": 7.4,
+      "decision": "review",
+      "decision_notes": [],
+      "priority_rank": 8,
+      "priority_tier": null,
+      "primary_rejection_reason": "low_intent_source",
+      "edge_case_flags": [],
+      "reasoning": "Media & Entertainment (Media, 150 employees) came in via Content download, last engaged 2024-01-01. Composite fit score 7.4/10 against the rubric places it in \"review\", with the weakest factor being: low-intent lead source.",
+      "borderline_note": "Scores mid-range at 7.4/10; check \"low-intent lead source\" before committing outreach time.",
+      "outreach_messages": [],
+      "commentary_source": "template"
+    },
+    {
+      "id": "Lead_030",
+      "name": "Priya Nair",
+      "company": "ClearWave Telecom",
+      "company_size": 280,
+      "industry": "Telecommunications",
+      "source": "Webinar attendee",
+      "last_interaction_date": "2023-12-28",
+      "source_file": "leads.csv",
+      "scores": {
+        "company_size": 10,
+        "industry_fit": 4,
+        "source_quality": 6,
+        "recency": 8,
+        "data_completeness": 10
+      },
+      "weighted_contributions": {
+        "company_size": 3,
+        "industry_fit": 0.8,
+        "source_quality": 1.5,
+        "recency": 1.2,
+        "data_completeness": 1
+      },
+      "composite_score": 7.5,
+      "decision": "review",
+      "decision_notes": [],
+      "priority_rank": 5,
+      "priority_tier": null,
+      "primary_rejection_reason": "poor_industry_fit",
+      "edge_case_flags": [],
+      "reasoning": "ClearWave Telecom (Telecommunications, 280 employees) came in via Webinar attendee, last engaged 2023-12-28. Composite fit score 7.5/10 against the rubric places it in \"review\", with the weakest factor being: industry outside our target segments.",
+      "borderline_note": "Scores mid-range at 7.5/10; check \"industry outside our target segments\" before committing outreach time.",
+      "outreach_messages": [],
+      "commentary_source": "template"
+    }
+  ]
+}
