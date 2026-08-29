@@ -18,7 +18,12 @@ const BandSchema = z.object({
 const ConfigSchema = z.object({
   llm: z.object({
     provider: z.enum(['groq', 'openai', 'gemini']),
-    model: z.string(),
+    // Never set in config.yaml — injected from PROD_MODEL / PROD_FALLBACK_MODEL
+    // below, so model names live in exactly one file: .env. Optional here:
+    // --dry-run never touches the LLM, so it shouldn't require a model to be
+    // configured at all. main.ts enforces PROD_MODEL is set before it
+    // actually tries to make a live call.
+    model: z.string().optional(),
     fallback_model: z.string().optional(),
     base_url: z.string().url(),
     api_key_env: z.string(),
@@ -62,10 +67,6 @@ const ConfigSchema = z.object({
     require_known_company_size: z.boolean(),
   }),
   priority_tiers: z.array(z.object({ min: z.number(), tier: z.string() })).min(1),
-  output: z.object({
-    sample_message_count: z.number().int().positive(),
-    write_priority_queue_csv: z.boolean(),
-  }),
 });
 
 export type AppConfig = z.infer<typeof ConfigSchema>;
@@ -75,7 +76,18 @@ export function loadConfig(configPath = path.resolve(process.cwd(), 'config.yaml
     throw new Error(`Config file not found at ${configPath}`);
   }
 
-  const parsed = yaml.load(fs.readFileSync(configPath, 'utf8'));
+  const parsed = yaml.load(fs.readFileSync(configPath, 'utf8')) as Record<string, unknown>;
+
+  // Model names are never hardcoded in config.yaml or in source — only in
+  // .env. Inject here so every consumer of AppConfig sees a resolved model
+  // without needing to know where it came from. Left undefined if PROD_MODEL
+  // isn't set — main.ts is what requires it, and only when actually about
+  // to make a live call, not for --dry-run.
+  if (parsed?.llm && typeof parsed.llm === 'object') {
+    (parsed.llm as Record<string, unknown>).model = process.env.PROD_MODEL;
+    (parsed.llm as Record<string, unknown>).fallback_model = process.env.PROD_FALLBACK_MODEL;
+  }
+
   const result = ConfigSchema.safeParse(parsed);
 
   if (!result.success) {

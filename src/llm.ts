@@ -163,6 +163,7 @@ function isRetryableStatus(status: number, body?: string): boolean {
 
 export class LlmClient {
   private readonly apiKey: string;
+  private readonly model: string;
   /** Flipped on after a rate limit so subsequent calls use the cheaper model. */
   private useFallbackModel = false;
 
@@ -180,6 +181,14 @@ export class LlmClient {
       );
     }
     this.apiKey = key;
+
+    // Model names live only in .env (PROD_MODEL) — main.ts already checks
+    // this before constructing an LlmClient, but enforce it here too so this
+    // class can never be used with an unresolved model.
+    if (!cfg.llm.model) {
+      throw new LlmError('PROD_MODEL is not set in .env.', undefined, false);
+    }
+    this.model = cfg.llm.model;
   }
 
   /** True when a key is present, so main.ts can degrade gracefully instead of throwing. */
@@ -188,9 +197,7 @@ export class LlmClient {
   }
 
   get activeModel(): string {
-    return this.useFallbackModel && this.cfg.llm.fallback_model
-      ? this.cfg.llm.fallback_model
-      : this.cfg.llm.model;
+    return this.useFallbackModel && this.cfg.llm.fallback_model ? this.cfg.llm.fallback_model : this.model;
   }
 
   /** Sends one chat request, retrying with backoff. Returns the raw reply text. */

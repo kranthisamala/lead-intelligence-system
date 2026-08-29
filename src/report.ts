@@ -1,18 +1,23 @@
 /**
- * Assembles output_report.json, the priority-queue CSV, and the console
- * summary — written for a sales team to act on, not just a developer.
- * Also holds Logger, the small dual-sink (console + output/run.log) logger
- * used across the pipeline.
+ * Assembles output_report.json and the console summary — written for a sales
+ * team to act on, not just a developer. Also holds Logger, the small
+ * dual-sink (console + output/run.log) logger used across the pipeline.
  */
 import * as fs from 'fs';
 import * as path from 'path';
 import { AppConfig } from './config';
-import { toIsoDate } from './dataLoader';
-import { REASON_LABELS } from './rubric';
+import { COMPLETENESS_FIELDS, REASON_LABELS } from './rubric';
 import { EnrichedLead, RejectionReasonStat, RunReport } from './types';
 
-/** Minutes a rep spends manually qualifying one lead, per the brief (8-12). */
-const MANUAL_MINUTES_PER_LEAD = 10;
+/** Internal field name -> the actual CSV column name, for reporting what's missing. */
+const CSV_COLUMN_NAMES: Record<(typeof COMPLETENESS_FIELDS)[number], string> = {
+  name: 'name',
+  company: 'company',
+  companySize: 'company_size',
+  industry: 'industry',
+  source: 'source',
+  lastInteractionDate: 'last_interaction_date',
+};
 
 // --- Logger ------------------------------------------------------------
 
@@ -67,10 +72,6 @@ function pct(n: number, total: number): number {
   return total === 0 ? 0 : Math.round((n / total) * 1000) / 10;
 }
 
-function round1(n: number): number {
-  return Math.round(n * 10) / 10;
-}
-
 function tally(values: string[]): RejectionReasonStat[] {
   const counts = new Map<string, number>();
   for (const v of values) counts.set(v, (counts.get(v) ?? 0) + 1);
@@ -79,42 +80,16 @@ function tally(values: string[]): RejectionReasonStat[] {
     .sort((a, b) => b.count - a.count || a.reason.localeCompare(b.reason));
 }
 
-/** Picks message samples from *different* leads so the variety is visible. */
-function pickSamples(leads: EnrichedLead[], limit: number) {
-  const qualified = leads
-    .filter((l) => l.decision === 'qualified' && l.outreachMessages.length > 0)
-    .sort((a, b) => (a.priorityRank ?? 0) - (b.priorityRank ?? 0));
-
-  const samples: RunReport['sample_outreach_messages'] = [];
-  // Alternate the variant taken from each lead so the samples show both angles.
-  for (let i = 0; i < qualified.length && samples.length < limit; i++) {
-    const lead = qualified[i];
-    const message = lead.outreachMessages[i % lead.outreachMessages.length];
-    samples.push({
-      lead: lead.name ?? lead.id,
-      company: lead.company,
-      variant: message.variant,
-      message: message.text,
-    });
-  }
-  return samples;
-}
-
 export interface ReportInputs {
   leads: EnrichedLead[];
   cfg: AppConfig;
   inputFile: string;
-  referenceDate: Date;
   llmEnabled: boolean;
   modelUsed: string;
-  batchesAttempted: number;
-  batchesFailed: number;
-  templateFallbacks: number;
-  durationMs: number;
 }
 
 export function buildReport(input: ReportInputs): RunReport {
-  const { leads, cfg } = input;
+  const { leads } = input;
   const total = leads.length;
 
   const qualified = leads.filter((l) => l.decision === 'qualified');
@@ -122,29 +97,20 @@ export function buildReport(input: ReportInputs): RunReport {
   const rejected = leads.filter((l) => l.decision === 'rejected');
   const insufficient = leads.filter((l) => l.decision === 'insufficient_data');
 
-  const avg = (xs: EnrichedLead[]) =>
-    xs.length === 0 ? 0 : round1(xs.reduce((s, l) => s + l.compositeScore, 0) / xs.length);
-
   // "Common rejection reasons" covers everything we are NOT pursuing outright,
   // which is what a sales lead actually wants to see trends in.
   const notPursued = [...rejected, ...insufficient, ...review];
 
   return {
-    run_metadata: {
-      timestamp: new Date().toISOString(),
+    run_summary: {
       input_file: input.inputFile,
       total_leads: total,
-      reference_date: toIsoDate(input.referenceDate),
+      timestamp: new Date().toISOString(),
       llm_enabled: input.llmEnabled,
-      provider: cfg.llm.provider,
       model_used: input.llmEnabled ? input.modelUsed : 'none (rule-based + templates)',
-      batches_attempted: input.batchesAttempted,
-      batches_failed: input.batchesFailed,
-      leads_with_template_fallback: input.templateFallbacks,
-      run_duration_ms: input.durationMs,
     },
 
-    summary_stats: {
+    aggregated_stats: {
       total_processed: total,
       qualified_count: qualified.length,
       qualified_pct: pct(qualified.length, total),
@@ -153,78 +119,57 @@ export function buildReport(input: ReportInputs): RunReport {
       rejected_count: rejected.length,
       rejected_pct: pct(rejected.length, total),
       insufficient_data_count: insufficient.length,
-      avg_score: avg(leads),
-      avg_score_qualified: avg(qualified),
       common_rejection_reasons: tally(
         notPursued.map((l) => l.primaryRejectionReason ?? 'unclassified'),
       ),
-      edge_cases_detected: tally(leads.flatMap((l) => l.edgeCaseFlags)),
-      estimated_analyst_hours_saved: round1((total * MANUAL_MINUTES_PER_LEAD) / 60),
     },
 
-    priority_queue: qualified
+    qualified: qualified
       .slice()
       .sort((a, b) => (a.priorityRank ?? 0) - (b.priorityRank ?? 0))
       .map((l) => ({
-        priority_rank: l.priorityRank ?? 0,
-        priority_tier: l.priorityTier ?? 'P3',
+        rank: l.priorityRank ?? 0,
+        tier: l.priorityTier ?? 'P3',
         id: l.id,
         name: l.name,
         company: l.company,
-        composite_score: l.compositeScore,
-        headline_reason: l.reasoning,
+        score: l.compositeScore,
+        reasoning: l.reasoning,
+        outreach_messages: l.outreachMessages,
       })),
 
-    flagged_for_review: review
+    review: review
       .slice()
       .sort((a, b) => (a.priorityRank ?? 0) - (b.priorityRank ?? 0))
       .map((l) => ({
+        rank: l.priorityRank ?? 0,
         id: l.id,
         name: l.name,
         company: l.company,
-        composite_score: l.compositeScore,
-        why_borderline:
-          l.borderlineNote ?? (l.decisionNotes.join(' ') || 'Mid-range composite score.'),
+        score: l.compositeScore,
+        reason: l.borderlineNote ?? (l.decisionNotes.join(' ') || 'Mid-range composite score.'),
       })),
 
-    disqualified: [...rejected, ...insufficient]
+    rejected: rejected
+      .slice()
       .sort((a, b) => b.compositeScore - a.compositeScore)
       .map((l) => ({
         id: l.id,
         name: l.name,
         company: l.company,
-        composite_score: l.compositeScore,
-        decision: l.decision,
-        primary_reason: l.primaryRejectionReason
+        score: l.compositeScore,
+        reason: l.primaryRejectionReason
           ? (REASON_LABELS[l.primaryRejectionReason] ?? l.primaryRejectionReason)
           : 'Unclassified',
       })),
 
-    sample_outreach_messages: pickSamples(leads, cfg.output.sample_message_count),
-
-    // Full audit trail, one entry per input row, in original file order.
-    leads: leads.map((l) => ({
+    insufficient: insufficient.map((l) => ({
       id: l.id,
-      name: l.name ?? null,
-      company: l.company ?? null,
-      company_size: l.companySize ?? null,
-      industry: l.industry ?? null,
-      source: l.source ?? null,
-      last_interaction_date: l.lastInteractionRaw ?? null,
-      source_file: l.origin ?? input.inputFile,
-      scores: l.scores,
-      weighted_contributions: l.weightedContributions,
-      composite_score: l.compositeScore,
-      decision: l.decision,
-      decision_notes: l.decisionNotes,
-      priority_rank: l.priorityRank ?? null,
-      priority_tier: l.priorityTier ?? null,
-      primary_rejection_reason: l.primaryRejectionReason ?? null,
-      edge_case_flags: l.edgeCaseFlags,
-      reasoning: l.reasoning,
-      borderline_note: l.borderlineNote ?? null,
-      outreach_messages: l.outreachMessages,
-      commentary_source: l.commentarySource,
+      name: l.name,
+      company: l.company,
+      missing_fields: COMPLETENESS_FIELDS.filter((f) => l[f] === undefined).map(
+        (f) => CSV_COLUMN_NAMES[f],
+      ),
     })),
   };
 }
@@ -234,101 +179,52 @@ export function writeReport(report: RunReport, outputPath: string): void {
   fs.writeFileSync(outputPath, JSON.stringify(report, null, 2), 'utf8');
 }
 
-/** Escapes a value for CSV: quote it, and double any inner quotes. */
-function csvCell(value: unknown): string {
-  const s = value === null || value === undefined ? '' : String(value);
-  return `"${s.replace(/"/g, '""').replace(/\r?\n/g, ' ')}"`;
-}
-
-/**
- * A flat priority queue the sales team can open in Excel and work top-down.
- * The JSON report is complete; this is the part they will actually use daily.
- */
-export function writePriorityQueueCsv(
-  leads: EnrichedLead[],
-  outputPath: string,
-): void {
-  const header = [
-    'priority_rank',
-    'priority_tier',
-    'name',
-    'company',
-    'industry',
-    'company_size',
-    'source',
-    'last_interaction_date',
-    'composite_score',
-    'reasoning',
-    'outreach_message',
-  ];
-
-  const rows = leads
-    .filter((l) => l.decision === 'qualified')
-    .sort((a, b) => (a.priorityRank ?? 0) - (b.priorityRank ?? 0))
-    .map((l) =>
-      [
-        l.priorityRank,
-        l.priorityTier,
-        l.name,
-        l.company,
-        l.industry,
-        l.companySize,
-        l.source,
-        l.lastInteractionRaw,
-        l.compositeScore,
-        l.reasoning,
-        l.outreachMessages[0]?.text ?? '',
-      ]
-        .map(csvCell)
-        .join(','),
-    );
-
-  fs.mkdirSync(path.dirname(outputPath), { recursive: true });
-  fs.writeFileSync(outputPath, [header.join(','), ...rows].join('\n'), 'utf8');
-}
-
 /** The at-a-glance block printed at the end of a run. */
-export function printSummary(report: RunReport, alerts: string[]): void {
-  const s = report.summary_stats;
-  const m = report.run_metadata;
+export function printSummary(
+  report: RunReport,
+  alerts: string[],
+  runInfo: { durationMs: number; batchesFailed: number; templateFallbacks: number },
+): void {
+  const s = report.aggregated_stats;
+  const m = report.run_summary;
   const line = '─'.repeat(64);
 
   console.log(`\n${line}`);
   console.log(`  LEAD INTELLIGENCE REPORT — ${m.input_file}`);
   console.log(line);
-  console.log(`  Processed          ${s.total_processed} leads in ${(m.run_duration_ms / 1000).toFixed(1)}s`);
-  console.log(`  Reference date     ${m.reference_date}   Model: ${m.model_used}`);
+  console.log(`  Processed          ${s.total_processed} leads in ${(runInfo.durationMs / 1000).toFixed(1)}s`);
+  console.log(`  Model              ${m.model_used}`);
   console.log(line);
   console.log(`  Qualified          ${s.qualified_count}  (${s.qualified_pct}%)`);
   console.log(`  Review             ${s.review_count}  (${s.review_pct}%)`);
   console.log(`  Rejected           ${s.rejected_count}  (${s.rejected_pct}%)`);
   console.log(`  Insufficient data  ${s.insufficient_data_count}`);
-  console.log(`  Avg score          ${s.avg_score}/10  (qualified: ${s.avg_score_qualified}/10)`);
   console.log(line);
   console.log('  Top reasons leads were not pursued:');
   for (const r of s.common_rejection_reasons.slice(0, 5)) {
     console.log(`    ${String(r.count).padStart(3)}  ${REASON_LABELS[r.reason] ?? r.reason}`);
   }
   console.log(line);
-  console.log('  Top of the priority queue:');
-  for (const p of report.priority_queue.slice(0, 5)) {
+  console.log('  Top of the qualified queue:');
+  for (const q of report.qualified.slice(0, 5)) {
     console.log(
-      `    ${p.priority_tier}  #${String(p.priority_rank).padStart(2)}  ${p.composite_score}/10  ` +
-        `${p.name ?? '(no name)'} — ${p.company ?? '(no company)'}`,
+      `    ${q.tier}  #${String(q.rank).padStart(2)}  ${q.score}/10  ` +
+        `${q.name ?? '(no name)'} — ${q.company ?? '(no company)'}`,
     );
   }
 
-  if (report.sample_outreach_messages.length > 0) {
+  const top = report.qualified[0];
+  if (top?.outreach_messages.length > 0) {
+    const msg = top.outreach_messages[0];
     console.log(line);
-    const sample = report.sample_outreach_messages[0];
-    console.log(`  Sample message (${sample.variant}) to ${sample.lead} at ${sample.company}:`);
-    console.log(`    "${sample.message}"`);
+    console.log(`  Sample message (${msg.variant}) to ${top.name ?? top.id} at ${top.company ?? '(no company)'}:`);
+    console.log(`    "${msg.text}"`);
   }
 
-  if (m.batches_failed > 0 || m.leads_with_template_fallback > 0) {
+  if (runInfo.batchesFailed > 0 || runInfo.templateFallbacks > 0) {
     console.log(line);
     console.log(
-      `  ! ${m.batches_failed} batch(es) failed; ${m.leads_with_template_fallback} lead(s) fell back to templates.`,
+      `  ! ${runInfo.batchesFailed} batch(es) failed; ${runInfo.templateFallbacks} lead(s) fell back to templates.`,
     );
     console.log('    Decisions are unaffected — only the generated prose. See output/run.log.');
   }

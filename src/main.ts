@@ -10,7 +10,7 @@ import { AppConfig, loadConfig } from './config';
 import { loadCsvs, normalizeAll, resolveReferenceDate, toIsoDate } from './dataLoader';
 import { enrichLeads, LlmClient } from './llm';
 import { assignPriority, scoreLead } from './rubric';
-import { buildReport, Logger, printSummary, writePriorityQueueCsv, writeReport } from './report';
+import { buildReport, Logger, printSummary, writeReport } from './report';
 
 // =============================================================================
 // CLI argument parsing (argv -> options; no dependency needed for this surface area)
@@ -18,39 +18,27 @@ import { buildReport, Logger, printSummary, writePriorityQueueCsv, writeReport }
 
 export type Provider = 'groq' | 'openai' | 'gemini';
 
-/** Per-provider defaults for a `--provider` switch. */
-const PROVIDER_PRESETS: Record<
-  Provider,
-  { base_url: string; api_key_env: string; model: string; fallback_model: string | undefined }
-> = {
-  groq: {
-    base_url: 'https://api.groq.com/openai/v1',
-    api_key_env: 'GROQ_API_KEY',
-    model: 'openai/gpt-oss-120b',
-    fallback_model: 'openai/gpt-oss-20b',
-  },
-  openai: {
-    base_url: 'https://api.openai.com/v1',
-    api_key_env: 'OPENAI_API_KEY',
-    model: 'gpt-4o',
-    fallback_model: 'gpt-4o-mini',
-  },
+/**
+ * Per-provider connection defaults for a `--provider` switch. Deliberately no
+ * model names here — those live only in .env (PROD_MODEL / PROD_FALLBACK_MODEL),
+ * so switching provider still requires passing `--model` explicitly, matching
+ * that provider's own catalog.
+ */
+const PROVIDER_PRESETS: Record<Provider, { base_url: string; api_key_env: string }> = {
+  groq: { base_url: 'https://api.groq.com/openai/v1', api_key_env: 'GROQ_API_KEY' },
+  openai: { base_url: 'https://api.openai.com/v1', api_key_env: 'OPENAI_API_KEY' },
   gemini: {
     base_url: 'https://generativelanguage.googleapis.com/v1beta',
     api_key_env: 'GEMINI_API_KEY',
-    model: 'gemini-2.0-flash',
-    fallback_model: undefined,
   },
 };
 
-/** Mutates cfg.llm to point at a different provider's defaults. `model` overrides the preset if given. */
-export function applyProviderPreset(cfg: AppConfig, provider: Provider, model?: string): void {
+/** Mutates cfg.llm to point at a different provider's connection defaults. */
+export function applyProviderPreset(cfg: AppConfig, provider: Provider): void {
   cfg.llm.provider = provider;
   const preset = PROVIDER_PRESETS[provider];
   cfg.llm.base_url = preset.base_url;
   cfg.llm.api_key_env = preset.api_key_env;
-  cfg.llm.model = model ?? preset.model;
-  cfg.llm.fallback_model = preset.fallback_model;
 }
 
 export interface CliOptions {
@@ -78,7 +66,9 @@ Options:
   --batch-size <n>     Leads per LLM call (default: config.yaml llm.batch_size)
   --limit <n>          Only process the first N leads. Useful for a cheap smoke test.
   --provider <name>    Override config.yaml: groq | openai | gemini
-  --model <name>       Override the configured model
+                       (switching provider needs --model too — model names
+                       live only in .env's PROD_MODEL, which is Groq-specific)
+  --model <name>       Override PROD_MODEL from .env
   --dry-run            Skip the LLM entirely. Rules engine + template prose only.
                        Free, instant, and the fastest way to sanity-check the rubric.
   --quiet              Suppress per-step console output (the summary still prints)
@@ -183,15 +173,8 @@ async function main(): Promise<number> {
 
   // CLI overrides win over config.yaml, so a run can be redirected without edits.
   if (opts.batchSize) cfg.llm.batch_size = opts.batchSize;
-  if (opts.provider && opts.provider !== cfg.llm.provider) {
-    // Also resets model/base_url — config.yaml's model is wrong for a
-    // different provider. --model still wins if given.
-    applyProviderPreset(cfg, opts.provider, opts.model);
-  } else if (opts.model) {
-    cfg.llm.model = opts.model;
-  } else if (process.env.PROD_MODEL) {
-    cfg.llm.model = process.env.PROD_MODEL;
-  }
+  if (opts.provider && opts.provider !== cfg.llm.provider) applyProviderPreset(cfg, opts.provider);
+  if (opts.model) cfg.llm.model = opts.model; // explicit --model always wins over PROD_MODEL
 
   const log = new Logger(path.join('output', 'run.log'), opts.quiet);
 
@@ -236,8 +219,14 @@ async function main(): Promise<number> {
     let client: LlmClient | null = null;
     if (opts.dryRun) {
       log.info('--dry-run: skipping the LLM. Decisions are identical; prose comes from templates.');
+    } else if (!cfg.llm.model) {
+      // Missing model is an expected condition (no .env set up yet), not a
+      // crash — same treatment as a missing key: warn and degrade.
+      log.warn(
+        'PROD_MODEL is not set in .env. Falling back to template prose. ' +
+          'Add it to .env for personalized messages, or pass --dry-run to silence this.',
+      );
     } else if (!LlmClient.hasKey(cfg)) {
-      // Missing key is an expected condition, not a crash: warn and degrade.
       log.warn(
         `No ${cfg.llm.api_key_env} found in the environment. Falling back to template prose. ` +
           `Add it to .env for personalized messages, or pass --dry-run to silence this.`,
@@ -260,25 +249,18 @@ async function main(): Promise<number> {
       leads: enriched,
       cfg,
       inputFile: file,
-      referenceDate,
       llmEnabled: client !== null,
-      modelUsed: client?.activeModel ?? cfg.llm.model,
-      batchesAttempted: stats.batchesAttempted,
-      batchesFailed: stats.batchesFailed,
-      templateFallbacks: stats.templateFallbacks,
-      durationMs: Date.now() - started,
+      modelUsed: client?.activeModel ?? 'n/a', // only shown when llmEnabled is true, where activeModel is always set
     });
 
     writeReport(report, opts.output);
     log.info(`Report written to ${path.resolve(opts.output)}`);
 
-    if (cfg.output.write_priority_queue_csv) {
-      const csvPath = path.join(path.dirname(opts.output), 'priority_queue.csv');
-      writePriorityQueueCsv(enriched, csvPath);
-      log.info(`Priority queue written to ${path.resolve(csvPath)}`);
-    }
-
-    printSummary(report, log.alerts);
+    printSummary(report, log.alerts, {
+      durationMs: Date.now() - started,
+      batchesFailed: stats.batchesFailed,
+      templateFallbacks: stats.templateFallbacks,
+    });
     return 0;
   } catch (err) {
     // Anything reaching here is a setup/input problem, not a per-lead problem —

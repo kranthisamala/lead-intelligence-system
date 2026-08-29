@@ -73,20 +73,14 @@ export interface RejectionReasonStat {
 }
 
 export interface RunReport {
-  run_metadata: {
-    timestamp: string;
+  run_summary: {
     input_file: string;
     total_leads: number;
-    reference_date: string;
+    timestamp: string;
     llm_enabled: boolean;
-    provider: string;
     model_used: string;
-    batches_attempted: number;
-    batches_failed: number;
-    leads_with_template_fallback: number;
-    run_duration_ms: number;
   };
-  summary_stats: {
+  aggregated_stats: {
     total_processed: number;
     qualified_count: number;
     qualified_pct: number;
@@ -95,41 +89,42 @@ export interface RunReport {
     rejected_count: number;
     rejected_pct: number;
     insufficient_data_count: number;
-    avg_score: number;
-    avg_score_qualified: number;
     common_rejection_reasons: RejectionReasonStat[];
-    edge_cases_detected: RejectionReasonStat[];
-    estimated_analyst_hours_saved: number;
   };
-  priority_queue: Array<{
-    priority_rank: number;
-    priority_tier: string;
+  /** Ranked, with outreach messages ready to send. */
+  qualified: Array<{
+    rank: number;
+    tier: string;
     id: string;
     name?: string;
     company?: string;
-    composite_score: number;
-    headline_reason: string;
+    score: number;
+    reasoning: string;
+    outreach_messages: OutreachMessage[];
   }>;
-  flagged_for_review: Array<{
+  /** Too close to call automatically — ranked, needs a human decision. */
+  review: Array<{
+    rank: number;
     id: string;
     name?: string;
     company?: string;
-    composite_score: number;
-    why_borderline: string;
+    score: number;
+    reason: string;
   }>;
-  disqualified: Array<{
+  /** Scored and judged a bad fit. No rank: nothing to prioritize for a lead you're not calling. */
+  rejected: Array<{
     id: string;
     name?: string;
     company?: string;
-    composite_score: number;
-    decision: Decision;
-    primary_reason: string;
+    score: number;
+    reason: string;
   }>;
-  sample_outreach_messages: Array<{
-    lead: string;
+  /** Too little data to judge at all — distinct from `rejected`, which means we judged it and it's a bad fit. */
+  insufficient: Array<{
+    id: string;
+    name?: string;
     company?: string;
-    variant: string;
-    message: string;
+    /** Which CSV columns were blank/unusable for this row, e.g. ["company_size", "industry"]. */
+    missing_fields: string[];
   }>;
-  leads: Array<Record<string, unknown>>;
 }

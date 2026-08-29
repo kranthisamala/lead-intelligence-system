@@ -1,15 +1,12 @@
 # Lead Intelligence System
 
 A CLI tool that scores inbound leads against a rubric, sorts them into a
-priority queue, and writes personalized outreach with an LLM. Built for the
-brief's scenario: a company getting ~1,200 leads a month, manually triaging
-each one in 8-12 minutes.
+priority queue, and writes personalized outreach message with using LLM. Built for: a company getting 1,200+ leads a month, manually triaging each one takes 8-12 minutes.
 
 ## How to run it
 
 ```bash
 npm install
-cp .env.example .env          # paste your GROQ_API_KEY in here
 npm start                     # full run on data/leads.csv
 ```
 
@@ -22,8 +19,9 @@ npm test        # live run on just 5 leads — test the prompt before the full b
 
 `npm start` is pinned to Groq by default; pass `--provider openai` or
 `--provider gemini` (with the matching key in `.env`) to use a different one.
-Output lands in `output/` — `output_report.json`, `priority_queue.csv` (a flat
-list an SDR can open in Excel), and `run.log`.
+Output lands in `output/` — `output_report.json` (three groups: `qualified`,
+`review`, `rejected`, each lead with its score/reasoning/decision, qualified
+leads with ready-to-send outreach messages) and `run.log`.
 
 ## The rubric
 
